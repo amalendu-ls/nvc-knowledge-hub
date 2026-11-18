@@ -1,0 +1,42 @@
+<div class="kh-brand-stripe"></div>
+<header class="kh-header">
+  <div class="kh-bar">
+    <a class="kh-brand" routerLink="/home" aria-label="Knowledge Hub home">
+      <img class="kh-brand-mark" src="assets/nvc/emblem-128.png" alt="" width="44" height="44">
+      <span class="kh-brand-text">
+        <span class="kh-name">Knowledge Hub</span>
+        <span class="kh-sub">An Institutional Repository initiative of Central Library</span>
+      </span>
+    </a>
+
+    <input type="checkbox" id="kh-nav-toggle" class="kh-nav-toggle-input" #navToggle>
+    <label for="kh-nav-toggle" class="kh-nav-toggle-btn" aria-label="Open menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </label>
+
+    <nav class="kh-top-nav" aria-label="Main navigation">
+      <details class="kh-nav-dropdown" #communities>
+        <summary>
+          Communities
+          <svg class="kh-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </summary>
+        <div class="kh-nav-dropdown-panel" (click)="communities.open = false; navToggle.checked = false">
+          <a routerLink="/handle/123456789/20" class="c-question-papers"><span class="kh-dot"></span>Old Question Paper Archive</a>
+          <a routerLink="/handle/123456789/18" class="c-publications"><span class="kh-dot"></span>Faculty Publications</a>
+          <a routerLink="/handle/123456789/16" class="c-profiles"><span class="kh-dot"></span>Faculty Profiles</a>
+          <a routerLink="/handle/123456789/35" class="c-journal"><span class="kh-dot"></span>Teachers' Journal</a>
+          <a routerLink="/handle/123456789/24" class="c-qa"><span class="kh-dot"></span>Quality Assurance &amp; Ranking</a>
+          <a routerLink="/handle/123456789/7" class="c-outreach"><span class="kh-dot"></span>Extension, Cultural, Sports &amp; Outreach</a>
+        </div>
+      </details>
+      <a routerLink="/browse/title" (click)="navToggle.checked = false">Browse</a>
+      <a routerLink="/statistics" (click)="navToggle.checked = false">Statistics</a>
+      <a routerLink="/home" fragment="about" (click)="navToggle.checked = false">About</a>
+      <a routerLink="/info/end-user-agreement" (click)="navToggle.checked = false">Policies</a>
+      <div class="kh-auth" role="toolbar" [attr.aria-label]="'nav.user.description' | translate">
+        <ds-auth-nav-menu></ds-auth-nav-menu>
+        <ds-impersonate-navbar></ds-impersonate-navbar>
+      </div>
+    </nav>
+  </div>
+</header>

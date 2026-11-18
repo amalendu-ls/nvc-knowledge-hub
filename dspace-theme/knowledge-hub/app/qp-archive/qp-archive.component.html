@@ -1,0 +1,204 @@
+<div class="fd">
+  <!-- ===== header ===== -->
+  <section class="fd-hero">
+    <div class="fd-hero-text">
+      <div class="fd-kicker">Nabadwip Vidyasagar College · Knowledge Hub</div>
+      <h1>{{ title }}</h1>
+      <p>Previous-year university question papers of the college, by scheme, department, semester and year.
+        Every paper can be read online or downloaded as PDF.</p>
+    </div>
+    <div class="fd-kpis qp-kpis">
+      <div class="fd-kpi"><b>{{ ready ? kpi.papers.toLocaleString('en-IN') : '—' }}</b><span>Question papers</span></div>
+      <div class="fd-kpi"><b>{{ ready ? kpi.depts : '—' }}</b><span>Departments / subjects</span></div>
+      <div class="fd-kpi"><b>{{ ready ? kpi.years : '—' }}</b><span>Exam years</span></div>
+      <div class="fd-kpi"><b>{{ ready ? kpi.pdfs.toLocaleString('en-IN') : '—' }}</b><span>PDFs available</span></div>
+    </div>
+  </section>
+
+  <!-- ===== schemes ===== -->
+  @if (schemes.length) {
+    <section class="qp-schemes" aria-label="Curriculum schemes">
+      @for (s of schemes; track s.uuid) {
+        <button type="button" class="qp-scheme" [class.on]="scope === s.uuid" (click)="pickScheme(s.uuid)">
+          <span class="qp-scheme-ic"><span class="fas fa-file-alt" aria-hidden="true"></span></span>
+          <span class="qp-scheme-txt"><b>{{ s.short }}</b><small>{{ s.years }}</small></span>
+          <span class="qp-scheme-n">{{ s.n.toLocaleString('en-IN') }}<small>papers</small></span>
+        </button>
+      }
+    </section>
+  }
+
+  <div class="fd-tabs" role="tablist">
+    <button type="button" role="tab" [class.on]="tab === 'find'" [attr.aria-selected]="tab === 'find'" (click)="tab = 'find'">
+      <span class="fas fa-search" aria-hidden="true"></span> Find a paper</button>
+    <button type="button" role="tab" [class.on]="tab === 'stats'" [attr.aria-selected]="tab === 'stats'" (click)="openStats()">
+      <span class="fas fa-chart-bar" aria-hidden="true"></span> Statistics</button>
+  </div>
+
+  @if (failed) {
+    <p class="fd-empty">The archive could not be loaded. Please refresh the page.</p>
+  }
+
+  @if (tab === 'find') {
+    <!-- ===== finder ===== -->
+    <section class="qp-finder" #finder aria-label="Find a question paper">
+      <div class="fd-search qp-q">
+        <span class="fas fa-search" aria-hidden="true"></span>
+        <input type="search" [(ngModel)]="query" (ngModelChange)="typed()" placeholder="Course code, paper or subject — e.g. PHSA-CC-1, Organic Chemistry…" aria-label="Search question papers">
+      </div>
+      <div class="qp-selects">
+        <label><span>Scheme</span>
+          <select [(ngModel)]="scope" (ngModelChange)="refresh()">
+            <option value="">All schemes</option>
+            @for (s of schemes; track s.uuid) { <option [value]="s.uuid">{{ s.short }} ({{ s.n }})</option> }
+          </select></label>
+        <label><span>Department</span>
+          <select [(ngModel)]="dept" (ngModelChange)="refresh()">
+            <option value="">All departments</option>
+            @for (o of opts['department']; track o.value) { <option [value]="o.value">{{ o.value }} ({{ o.n }})</option> }
+          </select></label>
+        <label><span>Exam year</span>
+          <select [(ngModel)]="year" (ngModelChange)="refresh()">
+            <option value="">All years</option>
+            @for (o of opts['examYear']; track o.value) { <option [value]="o.value">{{ o.value }} ({{ o.n }})</option> }
+          </select></label>
+        <label><span>Semester / Part</span>
+          <select [(ngModel)]="sem" (ngModelChange)="refresh()">
+            <option value="">All</option>
+            @for (o of opts['semester']; track o.value) { <option [value]="o.value">{{ o.value }} ({{ o.n }})</option> }
+          </select></label>
+        <label><span>Paper category</span>
+          <select [(ngModel)]="cat" (ngModelChange)="refresh()">
+            <option value="">All categories</option>
+            @for (o of opts['paperCategory']; track o.value) { <option [value]="o.value">{{ o.value }} ({{ o.n }})</option> }
+          </select></label>
+      </div>
+    </section>
+
+    @if (!hasFilter && deptTiles.length) {
+      <h2 class="qp-h2">Browse by department</h2>
+      <div class="qp-tiles">
+        @for (d of deptTiles; track d.value) {
+          <button type="button" class="qp-tile" (click)="pickDept(d.value)">
+            <span class="qp-tile-name">{{ d.value }}</span><span class="qp-tile-n">{{ d.n }}</span>
+          </button>
+        }
+      </div>
+    }
+
+    <div class="qp-results-head">
+      <h2 class="qp-h2">
+        @if (hasFilter) { {{ total.toLocaleString('en-IN') }} paper{{ total === 1 ? '' : 's' }} found } @else { Latest papers }
+      </h2>
+      <div class="qp-results-tools">
+        @if (hasFilter) { <button type="button" class="fd-link" (click)="clear()">Clear filters</button> }
+        <select [(ngModel)]="sort" (ngModelChange)="refresh()" aria-label="Sort">
+          <option value="new">Newest first</option>
+          <option value="code">Course code A–Z</option>
+        </select>
+      </div>
+    </div>
+    @if (hasFilter) {
+      <div class="qp-applied">
+        @if (scope) { <span>{{ scopeName }} <button type="button" (click)="scope = ''; refresh()" aria-label="Remove scheme filter">×</button></span> }
+        @if (dept) { <span>{{ dept }} <button type="button" (click)="dept = ''; refresh()" aria-label="Remove department filter">×</button></span> }
+        @if (year) { <span>{{ year }} <button type="button" (click)="year = ''; refresh()" aria-label="Remove year filter">×</button></span> }
+        @if (sem) { <span>{{ sem }} <button type="button" (click)="sem = ''; refresh()" aria-label="Remove semester filter">×</button></span> }
+        @if (cat) { <span>{{ cat }} <button type="button" (click)="cat = ''; refresh()" aria-label="Remove category filter">×</button></span> }
+        @if (query.trim()) { <span>“{{ query.trim() }}” <button type="button" (click)="query = ''; refresh()" aria-label="Remove search text">×</button></span> }
+      </div>
+    }
+
+    <div class="qp-list" [class.busy]="loading">
+      @if (!papers.length && !loading) {
+        <p class="fd-empty">No question paper matches these filters.</p>
+      }
+      @for (p of papers; track p.uuid) {
+        <article class="qp-paper">
+          <div class="qp-paper-ic" aria-hidden="true">
+            <span class="fas fa-file-pdf"></span><small>{{ p.year }}</small>
+          </div>
+          <div class="qp-paper-main">
+            <a class="qp-paper-title" [routerLink]="'/items/' + p.uuid">{{ p.code || p.title }}</a>
+            @if (p.code && p.title !== p.code) { <div class="qp-paper-sub">{{ p.title }}</div> }
+            <div class="qp-tags">
+              @if (p.dept) { <span class="t dept">{{ p.dept }}</span> }
+              @if (p.sem) { <span class="t">{{ p.sem }}</span> }
+              @if (p.cat) { <span class="t">{{ p.cat }}</span> }
+              @if (p.mode) { <span class="t">{{ p.mode }}</span> }
+              @if (p.stream) { <span class="t">{{ p.stream }}</span> }
+              @if (p.scheme) { <span class="t scheme">{{ p.scheme }}</span> }
+            </div>
+          </div>
+          <div class="qp-paper-act">
+            @if (p.pdf) { <a class="qp-btn primary" [routerLink]="p.pdf"><span class="fas fa-download" aria-hidden="true"></span> PDF</a> }
+            <a class="qp-btn" [routerLink]="'/items/' + p.uuid">Details</a>
+          </div>
+        </article>
+      }
+    </div>
+
+    @if (pages > 1) {
+      <nav class="qp-pager" aria-label="Pages">
+        <button type="button" [disabled]="page === 0" (click)="goPage(page - 1)">‹ Previous</button>
+        <span>Page {{ page + 1 }} of {{ pages }}</span>
+        <button type="button" [disabled]="page >= pages - 1" (click)="goPage(page + 1)">Next ›</button>
+      </nav>
+    }
+  } @else {
+    <!-- ===== statistics ===== -->
+    @if (!statsLoaded) {
+      <p class="fd-empty">Loading statistics…</p>
+    } @else {
+      <div class="fd-stats">
+        <section class="fd-panel fd-wide">
+          <h2>Papers by department</h2>
+          <p class="fd-note">Click a department to see its papers.</p>
+          <div class="fd-hbars">
+            @for (b of stats['department']; track b.name) {
+              <button type="button" class="fd-hbar" (click)="pickDept(b.name)">
+                <span class="lbl">{{ b.name }}</span>
+                <span class="track"><span class="fill" [style.width.%]="b.pct"></span></span>
+                <span class="val">{{ b.n }}</span>
+              </button>
+            }
+          </div>
+        </section>
+        <section class="fd-panel">
+          <h2>Papers by exam year</h2>
+          <div class="fd-vbars">
+            @for (b of stats['examYear']; track b.name) {
+              <div class="fd-vbar" [attr.title]="b.n + ' papers, ' + b.name">
+                <span class="n">{{ b.n }}</span>
+                <span class="col has" [style.height.px]="b.pct * 1.45"></span>
+                <span class="y">{{ b.name }}</span>
+              </div>
+            }
+          </div>
+        </section>
+        <section class="fd-panel">
+          <h2>Papers by scheme</h2>
+          @for (b of stats['scheme']; track b.name) {
+            <div class="fd-meter"><span class="lbl">{{ b.name }}</span><span class="track"><span class="fill soft" [style.width.%]="b.pct"></span></span><span class="val">{{ b.n }}</span></div>
+          }
+          <h3>Papers by category</h3>
+          @for (b of stats['paperCategory']; track b.name) {
+            <div class="fd-meter"><span class="lbl">{{ b.name }}</span><span class="track"><span class="fill alt" [style.width.%]="b.pct"></span></span><span class="val">{{ b.n }}</span></div>
+          }
+        </section>
+        <section class="fd-panel fd-wide">
+          <h2>Papers by semester / part</h2>
+          <div class="fd-vbars qp-sem">
+            @for (b of stats['semester']; track b.name) {
+              <div class="fd-vbar" [attr.title]="b.n + ' papers, ' + b.name">
+                <span class="n">{{ b.n }}</span>
+                <span class="col has" [style.height.px]="b.pct * 1.45"></span>
+                <span class="y">{{ b.name.replace('Semester ', 'Sem ') }}</span>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+    }
+  }
+</div>

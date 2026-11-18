@@ -1,0 +1,114 @@
+// Knowledge Hub header — ported from homepage-mockup.html
+:host {
+  display: block;
+  font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.kh-brand-stripe {
+  height: 4px;
+  background: linear-gradient(90deg, #8a3324, #29527a, #1f6f5c, #a87d1f, #6b3fa0, #b8493f);
+}
+
+.kh-header {
+  background: #fff;
+  border-bottom: 1px solid var(--kh-line);
+}
+
+.kh-bar {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.kh-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.kh-brand-mark {
+  width: 44px; height: 44px; flex-shrink: 0; display: block;   // college emblem
+}
+.kh-brand-text { min-width: 0; display: flex; flex-direction: column; }
+.kh-name { font-weight: bold; font-size: 17px; color: var(--kh-ink); }
+.kh-sub { font-size: 12px; color: var(--kh-ink-soft); }
+
+.kh-top-nav { margin-left: auto; display: flex; align-items: center; gap: 20px; font-size: 14px; }
+.kh-top-nav > a { color: var(--kh-ink); }
+.kh-top-nav > a:hover { color: var(--kh-accent); }
+
+.kh-auth {
+  display: flex; align-items: center;
+
+  ::ng-deep a.loginLink, ::ng-deep a.dropdownLogin, ::ng-deep .dropdownLogin, ::ng-deep #loginDropdownMenu, ::ng-deep a.dropdown-toggle {
+    color: var(--kh-ink);
+  }
+  ::ng-deep .loginLink, ::ng-deep .dropdownLogin {
+    border: 1px solid var(--kh-ink); border-radius: 6px;
+    padding: 6px 16px; font-size: 14px; white-space: nowrap;
+  }
+  ::ng-deep .loginLink:hover, ::ng-deep .dropdownLogin:hover { background: var(--kh-ink); color: #fff; }
+}
+
+/* Communities dropdown — <details>/<summary> */
+.kh-nav-dropdown { position: relative; }
+.kh-nav-dropdown summary {
+  list-style: none; cursor: pointer; display: flex; align-items: center; gap: 5px;
+  color: var(--kh-ink);
+}
+.kh-nav-dropdown summary::-webkit-details-marker { display: none; }
+.kh-nav-dropdown summary:hover { color: var(--kh-accent); }
+.kh-caret { transition: transform .15s; flex-shrink: 0; }
+.kh-nav-dropdown[open] .kh-caret { transform: rotate(180deg); }
+.kh-nav-dropdown-panel {
+  position: absolute; top: calc(100% + 12px); left: -14px;
+  background: #fff; border: 1px solid var(--kh-line); border-radius: 10px;
+  box-shadow: 0 10px 28px rgba(28, 25, 23, 0.12);
+  padding: 8px; width: 300px; z-index: 1030;
+}
+.kh-nav-dropdown-panel a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 7px; font-size: 13.5px; color: var(--kh-ink);
+}
+.kh-nav-dropdown-panel a:hover { background: var(--kh-paper); }
+.kh-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--c); }
+
+.c-question-papers { --c: #8a3324; }
+.c-publications    { --c: #29527a; }
+.c-profiles        { --c: #1f6f5c; }
+.c-journal         { --c: #a87d1f; }
+.c-qa              { --c: #6b3fa0; }
+.c-outreach        { --c: #b8493f; }
+
+/* mobile nav toggle — hidden above 700px */
+.kh-nav-toggle-input { display: none; }
+.kh-nav-toggle-btn {
+  display: none; flex-shrink: 0; width: 38px; height: 38px; border-radius: 6px;
+  border: 1px solid var(--kh-line); align-items: center; justify-content: center;
+  cursor: pointer; margin: 0 0 0 auto; color: var(--kh-ink);
+}
+
+@media (max-width: 700px) {
+  .kh-bar { padding: 12px 16px; flex-wrap: wrap; row-gap: 0; }
+  .kh-name { font-size: 15.5px; }
+  .kh-sub { font-size: 11px; }
+  .kh-nav-toggle-btn { display: flex; }
+
+  .kh-top-nav {
+    order: 3; flex-basis: 100%; margin-left: 0;
+    flex-direction: column; align-items: stretch; gap: 0;
+    max-height: 0; overflow: hidden;
+    transition: max-height .2s ease;
+  }
+  .kh-nav-toggle-input:checked ~ .kh-top-nav { max-height: 640px; }
+  .kh-top-nav > a { padding: 12px 4px; border-top: 1px solid var(--kh-line); font-size: 15px; }
+  .kh-auth { padding: 10px 4px 12px; border-top: 1px solid var(--kh-line); }
+
+  .kh-nav-dropdown { border-top: 1px solid var(--kh-line); }
+  .kh-nav-dropdown summary { padding: 12px 4px; font-size: 15px; justify-content: space-between; }
+  .kh-nav-dropdown-panel {
+    position: static; width: auto; border: none; box-shadow: none;
+    background: var(--kh-paper); padding: 4px 0 8px; margin: 0 0 4px;
+  }
+  .kh-nav-dropdown-panel a { padding: 10px 4px 10px 14px; }
+}

@@ -1,0 +1,173 @@
+<div class="fd">
+  <!-- ===== header ===== -->
+  <section class="fd-hero">
+    <div class="fd-hero-text">
+      <div class="fd-kicker">Nabadwip Vidyasagar College · Knowledge Hub</div>
+      <h1>{{ title }}</h1>
+      <p>Teaching faculty of the college with their research profiles, expertise and publications.
+        Publications are harvested daily from each member's ORCID record.</p>
+    </div>
+    <div class="fd-kpis">
+      <div class="fd-kpi"><b>{{ loaded ? kpi.faculty : '—' }}</b><span>Faculty members</span></div>
+      <div class="fd-kpi"><b>{{ loaded ? kpi.depts : '—' }}</b><span>Departments</span></div>
+      <div class="fd-kpi"><b>{{ loaded ? kpi.pubs : '—' }}</b><span>Publications</span></div>
+      <div class="fd-kpi"><b>{{ loaded ? kpi.orcid : '—' }}</b><span>With ORCID iD</span></div>
+      <div class="fd-kpi"><b>{{ loaded ? kpi.full : '—' }}</b><span>Full text / open access</span></div>
+    </div>
+  </section>
+
+  <div class="fd-tabs" role="tablist">
+    <button type="button" role="tab" [class.on]="tab === 'faculty'" [attr.aria-selected]="tab === 'faculty'" (click)="tab = 'faculty'">
+      <span class="fas fa-users" aria-hidden="true"></span> Faculty</button>
+    <button type="button" role="tab" [class.on]="tab === 'stats'" [attr.aria-selected]="tab === 'stats'" (click)="tab = 'stats'">
+      <span class="fas fa-chart-bar" aria-hidden="true"></span> Research statistics</button>
+  </div>
+
+  @if (!loaded) {
+    <p class="fd-empty">Loading faculty…</p>
+  } @else if (failed) {
+    <p class="fd-empty">The directory could not be loaded. Please refresh the page.</p>
+  } @else if (tab === 'faculty') {
+    <!-- ===== directory ===== -->
+    <section class="fd-toolbar" aria-label="Filter faculty">
+      <div class="fd-search">
+        <span class="fas fa-search" aria-hidden="true"></span>
+        <input type="search" [(ngModel)]="query" placeholder="Search by name, department or expertise…" aria-label="Search faculty">
+      </div>
+      <select [(ngModel)]="dept" aria-label="Department">
+        <option value="">All departments</option>
+        @for (d of departments; track d) { <option [value]="d">{{ d }}</option> }
+      </select>
+      <select [(ngModel)]="sort" aria-label="Sort">
+        <option value="name">Sort: Name</option>
+        <option value="dept">Sort: Department</option>
+        <option value="pubs">Sort: Publications</option>
+      </select>
+      <label class="fd-check"><input type="checkbox" [(ngModel)]="orcidOnly"> Has ORCID</label>
+      <div class="fd-seg" role="group" aria-label="Layout">
+        <button type="button" [class.on]="!grouped" (click)="grouped = false" title="Grid"><span class="fas fa-th-large" aria-hidden="true"></span><span class="sr-only">Grid</span></button>
+        <button type="button" [class.on]="grouped" (click)="grouped = true" title="Group by department"><span class="fas fa-layer-group" aria-hidden="true"></span><span class="sr-only">Group by department</span></button>
+      </div>
+    </section>
+    <nav class="fd-az" aria-label="Family name initial">
+      <button type="button" [class.on]="!letter" (click)="letter = ''">All</button>
+      @for (l of letters; track l) {
+        <button type="button" [class.on]="letter === l" (click)="letter = letter === l ? '' : l">{{ l }}</button>
+      }
+    </nav>
+    <div class="fd-count">
+      Showing <b>{{ filtered.length }}</b> of {{ people.length }} faculty members
+      @if (hasFilter) { · <button type="button" class="fd-link" (click)="clear()">clear filters</button> }
+    </div>
+
+    @if (!filtered.length) {
+      <p class="fd-empty">No faculty member matches these filters.</p>
+    }
+    @for (g of groups; track g.dept) {
+      @if (g.dept) { <h2 class="fd-group">{{ g.dept }} <small>{{ g.items.length }}</small></h2> }
+      <div class="fd-grid">
+        @for (p of g.items; track p.uuid) {
+          <a class="fd-card" [routerLink]="'/entities/person/' + p.uuid">
+            <div class="fd-card-top">
+              <div class="fd-avatar">
+                @if (p.thumb) { <img [src]="p.thumb" [alt]="'Photo of ' + p.name" loading="lazy" (error)="noPhoto(p)"> }
+                @else { <span aria-hidden="true">{{ p.initials }}</span> }
+              </div>
+              <div class="fd-who">
+                <div class="fd-name">{{ p.name }}</div>
+                <div class="fd-job">{{ p.job }}</div>
+                <div class="fd-dept">{{ p.dept }}</div>
+              </div>
+            </div>
+            @if (p.expertise.length) {
+              <div class="fd-chips">
+                @for (e of p.expertise.slice(0, 3); track e) { <span>{{ e }}</span> }
+              </div>
+            }
+            <div class="fd-card-foot">
+              <span class="fd-pubs" [class.zero]="!p.pubIds.length"><span class="fas fa-book-open" aria-hidden="true"></span>
+                {{ p.pubIds.length }} publication{{ p.pubIds.length === 1 ? '' : 's' }}</span>
+              <span class="fd-ids">
+                @if (p.vidwan) { <i class="ic vidwan" title="Vidwan">V</i> }
+                @if (p.orcid) { <i class="ic orcid" title="ORCID">iD</i> }
+                @if (p.scopus) { <i class="ic scopus" title="Scopus">Sc</i> }
+                @if (p.gs) { <i class="ic gs" title="Google Scholar">GS</i> }
+                @if (p.rid) { <i class="ic wos" title="Web of Science">W</i> }
+              </span>
+            </div>
+          </a>
+        }
+      </div>
+    }
+  } @else {
+    <!-- ===== statistics ===== -->
+    <div class="fd-stats">
+      <section class="fd-panel fd-wide">
+        <h2>Department-wise publications</h2>
+        <p class="fd-note">Publications in Knowledge Hub linked to faculty of each department (a paper co-written within one department counts once). Click a department to see its faculty.</p>
+        <div class="fd-hbars">
+          @for (b of deptBars; track b.name) {
+            <button type="button" class="fd-hbar" (click)="showDept(b.name)">
+              <span class="lbl">{{ b.name }}<small>{{ b.sub }}</small></span>
+              <span class="track"><span class="fill" [style.width.%]="b.pct"></span></span>
+              <span class="val">{{ b.n }}</span>
+            </button>
+          }
+        </div>
+      </section>
+
+      <section class="fd-panel">
+        <h2>Publications per year</h2>
+        <div class="fd-vbars">
+          @for (b of yearBars; track b.year) {
+            <div class="fd-vbar" [attr.title]="b.n + ' in ' + b.year">
+              <span class="n">{{ b.n || '' }}</span>
+              <span class="col" [class.has]="b.n" [style.height.px]="b.pct * 1.45"></span>
+              <span class="y">{{ b.year.slice(2) }}</span>
+            </div>
+          }
+        </div>
+      </section>
+
+      <section class="fd-panel">
+        <h2>Publication types</h2>
+        <div class="fd-stack">
+          @for (t of typeParts; track t.name) { <span [class]="t.cls" [style.width.%]="t.pct" [attr.title]="t.name + ': ' + t.n"></span> }
+        </div>
+        <ul class="fd-legend">
+          @for (t of typeParts; track t.name) { <li><i [class]="t.cls"></i>{{ t.name }}<b>{{ t.n }}</b></li> }
+        </ul>
+        <h3>Access</h3>
+        @for (b of access; track b.name) {
+          <div class="fd-meter"><span class="lbl">{{ b.name }}</span><span class="track"><span class="fill alt" [style.width.%]="b.pct"></span></span><span class="val">{{ b.pct }}%</span></div>
+        }
+      </section>
+
+      <section class="fd-panel">
+        <h2>Most published faculty</h2>
+        <ol class="fd-rank">
+          @for (b of topAuthors; track b.uuid; let i = $index) {
+            <li><span class="r">{{ i + 1 }}</span>
+              <a [routerLink]="'/entities/person/' + b.uuid">{{ b.name }}<small>{{ b.sub }}</small></a>
+              <b>{{ b.n }}</b></li>
+          }
+        </ol>
+      </section>
+
+      <section class="fd-panel">
+        <h2>Research identity coverage</h2>
+        <p class="fd-note">Share of faculty with each research profile ID.</p>
+        @for (b of idCoverage; track b.name) {
+          <div class="fd-meter"><span class="lbl">{{ b.name }}<small>{{ b.sub }}</small></span><span class="track"><span class="fill" [style.width.%]="b.pct"></span></span><span class="val">{{ b.pct }}%</span></div>
+        }
+      </section>
+
+      <section class="fd-panel">
+        <h2>Faculty by designation</h2>
+        @for (b of designations; track b.name) {
+          <div class="fd-meter"><span class="lbl">{{ b.name }}</span><span class="track"><span class="fill soft" [style.width.%]="b.pct"></span></span><span class="val">{{ b.n }}</span></div>
+        }
+      </section>
+    </div>
+  }
+</div>

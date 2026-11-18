@@ -1,0 +1,32 @@
+<header class="nvc-header">
+  <div class="container">
+    <div class="d-flex flex-row justify-content-between align-items-center">
+      <a class="nvc-brand my-2" routerLink="/home" role="button" tabindex="0"
+         aria-label="Nabadwip Vidyasagar College Institutional Repository - home">
+        <img class="nvc-logo d-none d-md-block" src="assets/images/nvc/nvc-logo.png" alt="Nabadwip Vidyasagar College"/>
+        <img class="nvc-emblem d-md-none" src="assets/images/nvc/nvc-emblem.jpg" alt="Nabadwip Vidyasagar College emblem"/>
+        <span class="nvc-brand-short d-md-none">NVC<br><small>Repository</small></span>
+        <span class="nvc-brand-tag d-none d-lg-inline-block">Institutional<br>Repository</span>
+      </a>
+
+      <div class="navbar navbar-light navbar-expand-md flex-shrink-0 px-0">
+        <ds-search-navbar></ds-search-navbar>
+        <div role="toolbar" [attr.aria-label]="'nav.user.description' | translate">
+          <ds-lang-switch></ds-lang-switch>
+          <ds-context-help-toggle></ds-context-help-toggle>
+          <ds-auth-nav-menu></ds-auth-nav-menu>
+          <ds-impersonate-navbar></ds-impersonate-navbar>
+        </div>
+        @if (isMobile$ | async) {
+          <div class="ps-2">
+            <button class="navbar-toggler px-0" type="button" (click)="toggleNavbar()"
+              aria-controls="collapsingNav"
+              aria-expanded="false" [attr.aria-label]="'nav.toggle' | translate">
+              <span class="fas fa-bars fa-fw toggler-icon" aria-hidden="true"></span>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</header>

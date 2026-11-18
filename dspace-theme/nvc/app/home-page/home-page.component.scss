@@ -1,0 +1,12 @@
+@import '../../../../app/home-page/home-page.component.scss';
+
+.nvc-home-lists {
+  padding-top: 24px;
+  padding-bottom: 32px;
+
+  ::ng-deep h2 {
+    color: var(--nvc-teal-d);
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+}

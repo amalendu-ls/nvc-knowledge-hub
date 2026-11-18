@@ -1,0 +1,19 @@
+<footer class="kh-footer">
+  <div class="kh-footer-note">
+    © {{ dateObj | date:'y' }} Nabadwip Vidyasagar College. Content is made available under the repository's
+    <a routerLink="/info/end-user-agreement">access and reuse policies</a>. Built on
+    <a href="https://www.dspace.org/" target="_blank" rel="noopener">DSpace</a>.
+  </div>
+  <ul class="kh-footer-links">
+    @if (showCookieSettings) {
+      <li><button type="button" (click)="openCookieSettings()">{{ 'footer.link.cookies' | translate }}</button></li>
+    }
+    <li><a routerLink="info/accessibility">{{ 'footer.link.accessibility' | translate }}</a></li>
+    @if (showPrivacyPolicy) {
+      <li><a routerLink="info/privacy">{{ 'footer.link.privacy-policy' | translate }}</a></li>
+    }
+    @if (showSendFeedback$ | async) {
+      <li><a routerLink="info/feedback">{{ 'footer.link.feedback' | translate }}</a></li>
+    }
+  </ul>
+</footer>

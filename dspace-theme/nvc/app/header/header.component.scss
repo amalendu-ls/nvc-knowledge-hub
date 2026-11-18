@@ -1,0 +1,57 @@
+@import '../../../../app/header/header.component.scss';
+
+.nvc-header {
+  background: #fff;
+  border-bottom: 3px solid var(--nvc-orange);
+}
+
+.nvc-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  min-width: 0;
+}
+
+.nvc-logo {
+  height: 64px;
+  width: auto;
+  max-width: 100%;
+}
+
+.nvc-brand-tag {
+  padding-left: 14px;
+  border-left: 2px solid var(--nvc-teal);
+  color: var(--nvc-teal-d);
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.nvc-emblem {
+  height: 44px;
+  width: 44px;
+}
+
+.nvc-brand-short {
+  color: var(--nvc-teal-d);
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.05;
+
+  small {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--nvc-orange);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .nvc-brand {
+    gap: 8px;
+  }
+}

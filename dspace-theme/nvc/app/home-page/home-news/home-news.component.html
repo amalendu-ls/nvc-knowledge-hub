@@ -1,0 +1,57 @@
+<section class="nvc-hero">
+  <div class="container">
+    <p class="nvc-eyebrow">Nabadwip Vidyasagar College · Central Library</p>
+    <h1 class="nvc-hero-title">Institutional Repository</h1>
+    <p class="nvc-hero-lead">
+      Open access to the college's question papers, quality-assurance documents, activity reports
+      and faculty scholarship &mdash; preserved in one searchable place.
+    </p>
+
+    <form class="nvc-search" role="search" (ngSubmit)="search()">
+      <label class="visually-hidden" for="nvc-home-q">Search the repository</label>
+      <span class="fas fa-search nvc-search-icon" aria-hidden="true"></span>
+      <input id="nvc-home-q" name="q" type="search" [(ngModel)]="query"
+             placeholder="Search title, course code, department, year…"
+             autocomplete="off">
+      <button type="submit" class="btn nvc-btn-orange">Search</button>
+    </form>
+
+    <ul class="nvc-stats" aria-label="Repository at a glance">
+      <li><strong>{{ counts['items'] !== undefined ? (counts['items'] | number) : '—' }}</strong><span>Items</span></li>
+      <li><strong>{{ counts['qp'] !== undefined ? (counts['qp'] | number) : '—' }}</strong><span>Question papers</span></li>
+      <li><strong>{{ counts['collections'] !== undefined ? (counts['collections'] | number) : '—' }}</strong><span>Collections</span></li>
+      <li><strong>{{ counts['communities'] !== undefined ? (counts['communities'] | number) : '—' }}</strong><span>Communities</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="nvc-cards container" aria-labelledby="nvc-explore">
+  <h2 id="nvc-explore" class="nvc-section-title">Explore the collections</h2>
+  <div class="row g-3 g-lg-4">
+    @for (c of cards; track c.title) {
+      <div class="col-12 col-md-6 col-lg-4">
+        <article class="nvc-card h-100">
+          <div class="nvc-card-icon" aria-hidden="true"><span class="fas {{ c.icon }}"></span></div>
+          <h3 class="nvc-card-title">
+            @if (c.link) {
+              <a [routerLink]="c.link">{{ c.title }}</a>
+            } @else {
+              <a [href]="c.href" target="_blank" rel="noopener">{{ c.title }} <span class="fas fa-external-link-alt small" aria-hidden="true"></span></a>
+            }
+          </h3>
+          @if (c.countKey && counts[c.countKey] !== undefined) {
+            <p class="nvc-card-count">{{ counts[c.countKey] | number }} items</p>
+          }
+          <p class="nvc-card-text">{{ c.text }}</p>
+          @if (c.subs) {
+            <ul class="nvc-chips">
+              @for (s of c.subs; track s.link) {
+                <li><a [routerLink]="s.link">{{ s.label }}</a></li>
+              }
+            </ul>
+          }
+        </article>
+      </div>
+    }
+  </div>
+</section>

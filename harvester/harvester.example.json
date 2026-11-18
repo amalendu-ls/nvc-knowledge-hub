@@ -1,0 +1,10 @@
+{
+  "contact_email": "librarian@example.edu",
+  "admin_email": "dspace-admin@example.edu",
+  "collection_handle": "123456789/<COLLECTION_ID>",
+  "report_to": "librarian@example.edu",
+  "max_new_per_run": 50,
+  "work_dir": "/home/dspace/harvest",
+  "scopus_api_key": "",
+  "wos_api_key": ""
+}

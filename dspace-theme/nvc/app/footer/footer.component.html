@@ -1,0 +1,73 @@
+<footer class="nvc-footer">
+  @if (showTopFooter) {
+    <div class="top-footer">
+      <div class="container py-4 py-lg-5">
+        <div class="row g-4">
+          <div class="col-lg-5 col-md-12">
+            <h2 class="nvc-f-title">Nabadwip Vidyasagar College</h2>
+            <p class="nvc-f-text">
+              Institutional Repository maintained by the Central Library. Affiliated to the University of Kalyani.
+            </p>
+            <p class="nvc-f-text mb-0">
+              Nabadwip, Nadia &ndash; 741302<br>West Bengal, India
+            </p>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <h2 class="nvc-f-head">Explore</h2>
+            <ul class="list-unstyled nvc-f-links">
+              <li><a routerLink="/community-list">All communities &amp; collections</a></li>
+              <li><a routerLink="/browse/dateissued">Browse by date</a></li>
+              <li><a routerLink="/browse/title">Browse by title</a></li>
+              <li><a routerLink="/search">Advanced search</a></li>
+            </ul>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <h2 class="nvc-f-head">NVC online</h2>
+            <ul class="list-unstyled nvc-f-links">
+              <li><a href="https://nvc.ac.in" target="_blank" rel="noopener">College website</a></li>
+              <li><a href="https://nvc.ac.in/library/" target="_blank" rel="noopener">Central Library</a></li>
+              <li><a href="https://learn.nvc.ac.in" target="_blank" rel="noopener">NVC Learn (LMS)</a></li>
+              <li><a href="https://nvc.irins.org/" target="_blank" rel="noopener">Faculty profiles on IRINS</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="bottom-footer py-2">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+      <p class="m-0 small">
+        &copy; {{ dateObj | date:'y' }} Nabadwip Vidyasagar College &middot;
+        Powered by <a href="https://www.dspace.org/" target="_blank" rel="noopener">DSpace</a>
+      </p>
+      <ul class="footer-info list-unstyled d-flex flex-wrap justify-content-center mb-0 small">
+        @if (showCookieSettings) {
+          <li>
+            <button class="btn btn-link btn-sm" type="button" (click)="openCookieSettings()">
+              {{ 'footer.link.cookies' | translate}}
+            </button>
+          </li>
+        }
+        <li>
+          <a class="btn btn-sm" routerLink="info/accessibility">{{ 'footer.link.accessibility' | translate }}</a>
+        </li>
+        @if (showPrivacyPolicy) {
+          <li>
+            <a class="btn btn-sm" routerLink="info/privacy">{{ 'footer.link.privacy-policy' | translate}}</a>
+          </li>
+        }
+        @if (showEndUserAgreement) {
+          <li>
+            <a class="btn btn-sm" routerLink="info/end-user-agreement">{{ 'footer.link.end-user-agreement' | translate}}</a>
+          </li>
+        }
+        @if (showSendFeedback$ | async) {
+          <li>
+            <a class="btn btn-sm" routerLink="info/feedback">{{ 'footer.link.feedback' | translate}}</a>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</footer>

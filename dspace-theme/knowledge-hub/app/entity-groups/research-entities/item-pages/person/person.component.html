@@ -1,0 +1,165 @@
+@if (showBackButton$ | async) {
+  <ds-results-back-button [back]="back"></ds-results-back-button>
+}
+
+<div class="kp">
+  <div class="kp-admin"><ds-dso-edit-menu></ds-dso-edit-menu></div>
+
+  <!-- ===== profile header ===== -->
+  <section class="kp-hero">
+    <div class="kp-band"></div>
+    <div class="kp-hero-body">
+      <div class="kp-avatar" [class.has-photo]="photo">
+        @if (photo) {
+          <img [src]="photo" [alt]="'Photo of ' + displayName">
+        } @else {
+          <span aria-hidden="true">{{ initials }}</span>
+        }
+      </div>
+      <div class="kp-who">
+        <h1>{{ displayName }}</h1>
+        <div class="kp-role">{{ roleLine }}</div>
+        <div class="kp-meta">
+          @if (v('person.email')) {
+            <a [href]="'mailto:' + v('person.email')"><span class="fas fa-envelope" aria-hidden="true"></span> {{ v('person.email') }}</a>
+          }
+          @if (v('local.vidwanId')) {
+            <span><span class="fas fa-id-badge" aria-hidden="true"></span> Vidwan {{ v('local.vidwanId') }}</span>
+          }
+        </div>
+        @if (expertise.length) {
+          <div class="kp-chips">
+            @for (e of expertise; track e) { <span class="kp-chip">{{ e }}</span> }
+          </div>
+        }
+      </div>
+      <div class="kp-ids">
+        @if (v('local.vidwanProfile')) {
+          <a class="kp-idbtn primary" [href]="v('local.vidwanProfile')" target="_blank" rel="noopener">
+            <span class="ic vidwan">V</span>Vidwan profile<small>INFLIBNET</small></a>
+        }
+        <a class="kp-idbtn" href="https://nvc.irins.org/" target="_blank" rel="noopener">
+          <span class="ic irins">IR</span>NVC on IRINS<small>portal</small></a>
+        @if (v('person.identifier.orcid')) {
+          <a class="kp-idbtn" [href]="'https://orcid.org/' + v('person.identifier.orcid')" target="_blank" rel="noopener">
+            <span class="ic orcid">iD</span>ORCID<small>{{ v('person.identifier.orcid') }}</small></a>
+        }
+        @if (v('person.identifier.scopus-author-id')) {
+          <a class="kp-idbtn" [href]="'https://www.scopus.com/authid/detail.uri?authorId=' + v('person.identifier.scopus-author-id')" target="_blank" rel="noopener">
+            <span class="ic scopus">Sc</span>Scopus<small>{{ v('person.identifier.scopus-author-id') }}</small></a>
+        }
+        @if (v('person.identifier.rid')) {
+          <a class="kp-idbtn" [href]="'https://www.webofscience.com/wos/author/record/' + v('person.identifier.rid')" target="_blank" rel="noopener">
+            <span class="ic wos">WoS</span>Web of Science<small>{{ v('person.identifier.rid') }}</small></a>
+        }
+        @if (v('person.identifier.gsid')) {
+          <a class="kp-idbtn" [href]="'https://scholar.google.com/citations?user=' + v('person.identifier.gsid')" target="_blank" rel="noopener">
+            <span class="ic gs">GS</span>Google Scholar<small>profile</small></a>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== summary ===== -->
+  <section class="kp-stats" aria-label="Publication summary">
+    <div class="kp-stat"><div class="n">{{ loaded ? stats.total : '—' }}</div><div class="l">Publications in Knowledge Hub</div></div>
+    <div class="kp-stat"><div class="n">{{ loaded ? stats.articles : '—' }}</div><div class="l">Journal articles</div></div>
+    <div class="kp-stat"><div class="n">{{ loaded ? stats.chapters : '—' }}</div><div class="l">Book chapters</div></div>
+    <div class="kp-stat"><div class="n">{{ loaded ? stats.doi : '—' }}</div><div class="l">With DOI</div></div>
+    <div class="kp-stat"><div class="n">{{ loaded ? stats.years : '—' }}</div><div class="l">Publishing years</div></div>
+  </section>
+
+  <div class="kp-cols">
+    <!-- ===== publications ===== -->
+    <main class="kp-card">
+      <h2>Publications</h2>
+      <div class="kp-toolbar">
+        <input type="search" [(ngModel)]="query" placeholder="Search within these publications…" aria-label="Search publications">
+        <div class="kp-seg" role="group" aria-label="Filter by type">
+          <button type="button" [class.on]="filter === 'all'" (click)="filter = 'all'">All</button>
+          <button type="button" [class.on]="filter === 'article'" (click)="filter = 'article'">Articles</button>
+          <button type="button" [class.on]="filter === 'chapter'" (click)="filter = 'chapter'">Chapters</button>
+          <button type="button" [class.on]="filter === 'full'" (click)="filter = 'full'">Full text</button>
+        </div>
+      </div>
+
+      @if (!loaded) {
+        <p class="kp-empty">Loading publications…</p>
+      } @else if (!pubs.length) {
+        <p class="kp-empty">No publications in Knowledge Hub yet. Publications listed in this person's ORCID record are added automatically every day.</p>
+      } @else if (!filtered.length) {
+        <p class="kp-empty">No publications match this filter.</p>
+      } @else {
+        @for (g of groups; track g.year) {
+          <div class="kp-year">{{ g.year }}</div>
+          @for (p of g.items; track p.uuid) {
+            <article class="kp-pub">
+              <a class="kp-pub-title" [routerLink]="'/items/' + p.uuid">{{ p.title }}</a>
+              <div class="kp-pub-authors">
+                @for (a of p.authors; track $index; let last = $last) {
+                  @if (a.me) { <b>{{ a.name }}</b> } @else { {{ a.name }} }@if (!last) { · }
+                }
+              </div>
+              @if (p.journal || p.source) {
+                <div class="kp-pub-src">@if (p.journal) { <em>{{ p.journal }}</em> }@if (p.journal && p.source) {, }{{ p.source }}</div>
+              }
+              <div class="kp-badges">
+                @if (p.type) { <span class="b type">{{ p.type }}</span> }
+                @if (p.hasPdf) { <a class="b pdf" [routerLink]="'/items/' + p.uuid">PDF</a> }
+                @else if (p.oaLink) { <a class="b oa" [href]="p.oaLink" target="_blank" rel="noopener">Open Access</a> }
+                @if (p.doi) { <a class="b doi" [href]="'https://doi.org/' + p.doi" target="_blank" rel="noopener">DOI {{ p.doi }}</a> }
+                <button type="button" class="b cite" [class.on]="openCite === p.uuid" (click)="toggleCite(p.uuid)">Cite</button>
+              </div>
+              @if (openCite === p.uuid) {
+                <div class="kp-cite">
+                  @for (s of [['MLA', p.cite.mla], ['APA', p.cite.apa], ['BibTeX', p.cite.bib]]; track s[0]) {
+                    <div class="kp-cite-row">
+                      <div class="kp-cite-label"><span>{{ s[0] }}</span>
+                        <button type="button" (click)="copy(s[1], p.uuid + s[0])">{{ copied === p.uuid + s[0] ? 'Copied' : 'Copy' }}</button></div>
+                      <div class="kp-cite-text">{{ s[1] }}</div>
+                    </div>
+                  }
+                </div>
+              }
+            </article>
+          }
+        }
+      }
+    </main>
+
+    <!-- ===== sidebar ===== -->
+    <aside class="kp-side">
+      @if (perYear.length) {
+        <div class="kp-card">
+          <h3>Publications per year</h3>
+          <div class="kp-bars" aria-label="Publications per year">
+            @for (b of perYear; track b.year) {
+              <div class="kp-bar" [class.has]="b.n" [style.height.%]="b.pct" [attr.title]="b.n + ' in 20' + b.year"><span>{{ b.year }}</span></div>
+            }
+          </div>
+        </div>
+      }
+      @if (topJournals.length) {
+        <div class="kp-card">
+          <h3>Published most in</h3>
+          <ul class="kp-list">
+            @for (j of topJournals; track j.name) { <li><span>{{ j.name }}</span><b>{{ j.n }}</b></li> }
+          </ul>
+        </div>
+      }
+      @if (coAuthors.length) {
+        <div class="kp-card">
+          <h3>Frequent co-authors</h3>
+          <ul class="kp-list">
+            @for (c of coAuthors; track c.name) { <li><span>{{ c.name }}</span><b>{{ c.n }}</b></li> }
+          </ul>
+        </div>
+      }
+      <div class="kp-card kp-about">
+        <h3>About this profile</h3>
+        <p>Profile details from Vidwan (INFLIBNET). Publications come from IRINS and are harvested daily from the faculty member's ORCID record.</p>
+        <a [routerLink]="[itemPageRoute + '/full']">Full item record →</a>
+      </div>
+    </aside>
+  </div>
+</div>

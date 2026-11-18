@@ -1,0 +1,168 @@
+<div class="fd">
+  <!-- ===== header ===== -->
+  <section class="fd-hero">
+    <div class="fd-hero-text">
+      <div class="fd-kicker">Nabadwip Vidyasagar College · Knowledge Hub</div>
+      <h1>{{ title }}</h1>
+      <p>Journal articles, book chapters and conference papers by the faculty of the college.
+        New publications are harvested daily from faculty ORCID records; open-access full texts are kept here.</p>
+    </div>
+    <div class="fd-kpis">
+      <div class="fd-kpi"><b>{{ loaded ? kpi.pubs : '—' }}</b><span>Publications</span></div>
+      <div class="fd-kpi"><b>{{ loaded ? kpi.faculty : '—' }}</b><span>Contributing faculty</span></div>
+      <div class="fd-kpi"><b>{{ loaded ? kpi.journals : '—' }}</b><span>Journals &amp; sources</span></div>
+      <div class="fd-kpi"><b>{{ loaded ? kpi.doi : '—' }}</b><span>With DOI</span></div>
+      <div class="fd-kpi"><b>{{ loaded ? kpi.full : '—' }}</b><span>Full text / open access</span></div>
+    </div>
+  </section>
+
+  <div class="fd-tabs" role="tablist">
+    <button type="button" role="tab" [class.on]="tab === 'pubs'" [attr.aria-selected]="tab === 'pubs'" (click)="tab = 'pubs'">
+      <span class="fas fa-book-open" aria-hidden="true"></span> Publications</button>
+    <button type="button" role="tab" [class.on]="tab === 'stats'" [attr.aria-selected]="tab === 'stats'" (click)="tab = 'stats'">
+      <span class="fas fa-chart-bar" aria-hidden="true"></span> Statistics</button>
+  </div>
+
+  @if (!loaded) {
+    <p class="fd-empty">Loading publications…</p>
+  } @else if (failed) {
+    <p class="fd-empty">The publications could not be loaded. Please refresh the page.</p>
+  } @else if (tab === 'pubs') {
+    <section class="fd-toolbar" aria-label="Filter publications">
+      <div class="fd-search">
+        <span class="fas fa-search" aria-hidden="true"></span>
+        <input type="search" [(ngModel)]="query" (ngModelChange)="changed()" placeholder="Search title, author, journal or DOI…" aria-label="Search publications">
+      </div>
+      <select [(ngModel)]="dept" (ngModelChange)="changed()" aria-label="Department">
+        <option value="">All departments</option>
+        @for (d of departments; track d) { <option [value]="d">{{ d }}</option> }
+      </select>
+      <select [(ngModel)]="year" (ngModelChange)="changed()" aria-label="Year">
+        <option value="">All years</option>
+        @for (y of years; track y) { <option [value]="y">{{ y }}</option> }
+      </select>
+      <select [(ngModel)]="type" (ngModelChange)="changed()" aria-label="Type">
+        <option value="">All types</option>
+        @for (t of types; track t) { <option [value]="t">{{ t }}</option> }
+      </select>
+      <select [(ngModel)]="sort" aria-label="Sort">
+        <option value="new">Newest first</option>
+        <option value="old">Oldest first</option>
+        <option value="title">Title A–Z</option>
+      </select>
+      <label class="fd-check"><input type="checkbox" [(ngModel)]="fullOnly" (ngModelChange)="changed()"> Full text only</label>
+    </section>
+    <div class="fd-count ro-count">
+      Showing <b>{{ filtered.length }}</b> of {{ pubs.length }} publications
+      @if (hasFilter) { · <button type="button" class="fd-link" (click)="clear()">clear filters</button> }
+    </div>
+
+    <main class="ro-list">
+      @if (!filtered.length) {
+        <p class="fd-empty">No publication matches these filters.</p>
+      }
+      @for (g of groups; track g.year) {
+        @if (g.year) { <div class="ro-year">{{ g.year }}</div> }
+        @for (p of g.items; track p.uuid) {
+          <article class="ro-pub">
+            <a class="ro-title" [routerLink]="'/items/' + p.uuid">{{ p.title }}</a>
+            <div class="ro-authors">
+              @for (a of p.authors; track $index; let last = $last) {
+                @if (a.uuid) { <a class="me" [routerLink]="'/entities/person/' + a.uuid">{{ a.name }}</a> } @else { {{ a.name }} }@if (!last) { · }
+              }
+            </div>
+            @if (p.journal || p.source) {
+              <div class="ro-src">@if (p.journal) { <em>{{ p.journal }}</em> }@if (p.journal && p.source) {, }{{ p.source }}</div>
+            }
+            <div class="ro-badges">
+              <span class="b type">{{ p.type }}</span>
+              @for (d of p.depts; track d) { <span class="b dept">{{ d }}</span> }
+              @if (p.hasPdf) { <a class="b pdf" [routerLink]="'/items/' + p.uuid">PDF</a> }
+              @else if (p.oaLink) { <a class="b oa" [href]="p.oaLink" target="_blank" rel="noopener">Open Access</a> }
+              @if (p.doi) { <a class="b doi" [href]="'https://doi.org/' + p.doi" target="_blank" rel="noopener">DOI {{ p.doi }}</a> }
+              <button type="button" class="b cite" [class.on]="openCite === p.uuid" (click)="toggleCite(p.uuid)">Cite</button>
+            </div>
+            @if (openCite === p.uuid) {
+              <div class="ro-cite">
+                @for (s of [['MLA', p.cite.mla], ['APA', p.cite.apa], ['BibTeX', p.cite.bib]]; track s[0]) {
+                  <div class="ro-cite-row">
+                    <div class="ro-cite-label"><span>{{ s[0] }}</span>
+                      <button type="button" (click)="copy(s[1], p.uuid + s[0])">{{ copied === p.uuid + s[0] ? 'Copied' : 'Copy' }}</button></div>
+                    <div class="ro-cite-text">{{ s[1] }}</div>
+                  </div>
+                }
+              </div>
+            }
+          </article>
+        }
+      }
+      @if (filtered.length > limit) {
+        <div class="ro-more"><button type="button" (click)="limit = limit + 30">Show more ({{ filtered.length - limit }} remaining)</button></div>
+      }
+    </main>
+  } @else {
+    <div class="fd-stats">
+      <section class="fd-panel fd-wide">
+        <h2>Publications per year</h2>
+        <p class="fd-note">Click a year to list its publications.</p>
+        <div class="fd-vbars">
+          @for (b of yearBars; track b.year) {
+            <button type="button" class="fd-vbar ro-vbtn" [attr.title]="b.n + ' in ' + b.year" (click)="showYear(b.year)" [disabled]="!b.n">
+              <span class="n">{{ b.n || '' }}</span>
+              <span class="col" [class.has]="b.n" [style.height.px]="b.pct * 1.45"></span>
+              <span class="y">{{ b.year.slice(2) }}</span>
+            </button>
+          }
+        </div>
+      </section>
+
+      <section class="fd-panel fd-wide">
+        <h2>Department-wise publications</h2>
+        <p class="fd-note">A paper co-written by faculty of two departments counts for both. Click a department to list its publications.</p>
+        <div class="fd-hbars">
+          @for (b of deptBars; track b.name) {
+            <button type="button" class="fd-hbar" (click)="showDept(b.name)">
+              <span class="lbl">{{ b.name }}<small>{{ b.sub }}</small></span>
+              <span class="track"><span class="fill" [style.width.%]="b.pct"></span></span>
+              <span class="val">{{ b.n }}</span>
+            </button>
+          }
+        </div>
+      </section>
+
+      <section class="fd-panel">
+        <h2>Publication types</h2>
+        <div class="fd-stack">
+          @for (t of typeParts; track t.name) { <span [class]="t.cls" [style.width.%]="t.pct" [attr.title]="t.name + ': ' + t.n"></span> }
+        </div>
+        <ul class="fd-legend">
+          @for (t of typeParts; track t.name) { <li><i [class]="t.cls"></i>{{ t.name }}<b>{{ t.n }}</b></li> }
+        </ul>
+        <h3>Access</h3>
+        @for (b of access; track b.name) {
+          <div class="fd-meter"><span class="lbl">{{ b.name }}<small>{{ b.sub }}</small></span><span class="track"><span class="fill alt" [style.width.%]="b.pct"></span></span><span class="val">{{ b.pct }}%</span></div>
+        }
+      </section>
+
+      <section class="fd-panel">
+        <h2>Most published faculty</h2>
+        <ol class="fd-rank">
+          @for (b of topAuthors; track b.uuid; let i = $index) {
+            <li><span class="r">{{ i + 1 }}</span>
+              <a [routerLink]="'/entities/person/' + b.uuid">{{ b.name }}<small>{{ b.sub }}</small></a>
+              <b>{{ b.n }}</b></li>
+          }
+        </ol>
+      </section>
+
+      <section class="fd-panel fd-wide">
+        <h2>Top journals &amp; sources</h2>
+        <div class="ro-journals">
+          @for (b of topJournals; track b.name) {
+            <div class="fd-meter"><span class="lbl ro-jname" [attr.title]="b.name">{{ b.name }}</span><span class="track"><span class="fill soft" [style.width.%]="b.pct"></span></span><span class="val">{{ b.n }}</span></div>
+          }
+        </div>
+      </section>
+    </div>
+  }
+</div>

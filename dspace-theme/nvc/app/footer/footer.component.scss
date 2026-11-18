@@ -1,0 +1,51 @@
+@import '../../../../app/footer/footer.component.scss';
+
+.nvc-footer {
+  .top-footer {
+    background: var(--nvc-teal-d);
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  .bottom-footer {
+    background: #083a34;
+    color: rgba(255, 255, 255, 0.8);
+
+    a, .btn, .btn-link {
+      color: rgba(255, 255, 255, 0.85);
+    }
+  }
+
+  a {
+    color: #fff;
+    text-decoration: none;
+
+    &:hover, &:focus {
+      color: #ffd79a;
+      text-decoration: underline;
+    }
+  }
+}
+
+.nvc-f-title {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.nvc-f-head {
+  color: #ffd79a;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+
+.nvc-f-text {
+  font-size: 0.95rem;
+}
+
+.nvc-f-links li {
+  margin-bottom: 8px;
+}

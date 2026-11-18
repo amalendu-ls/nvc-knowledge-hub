@@ -1,0 +1,33 @@
+{
+  "repository.title": "Knowledge Hub",
+
+  "repository.title.prefix": "Knowledge Hub :: ",
+
+  "menu.header.image.logo": "Knowledge Hub — Nabadwip Vidyasagar College",
+
+  // Knowledge Hub search filters (discovery.xml searchFilterNvc*)
+  "search.filters.filter.department.head": "Department",
+  "search.filters.filter.department.placeholder": "Department",
+  "search.filters.filter.department.label": "Search department",
+  "search.filters.applied.f.department": "Department",
+  "search.filters.filter.examYear.head": "Exam year",
+  "search.filters.filter.examYear.placeholder": "Exam year",
+  "search.filters.filter.examYear.label": "Search exam year",
+  "search.filters.applied.f.examYear": "Exam year",
+  "search.filters.filter.semester.head": "Semester",
+  "search.filters.filter.semester.placeholder": "Semester",
+  "search.filters.filter.semester.label": "Search semester",
+  "search.filters.applied.f.semester": "Semester",
+  "search.filters.filter.scheme.head": "Curriculum scheme",
+  "search.filters.filter.scheme.placeholder": "Scheme",
+  "search.filters.filter.scheme.label": "Search scheme",
+  "search.filters.applied.f.scheme": "Scheme",
+  "search.filters.filter.paperCategory.head": "Paper category",
+  "search.filters.filter.paperCategory.placeholder": "Paper category",
+  "search.filters.filter.paperCategory.label": "Search paper category",
+  "search.filters.applied.f.paperCategory": "Paper category",
+  "search.filters.filter.publicationType.head": "Publication type",
+  "search.filters.filter.publicationType.placeholder": "Publication type",
+  "search.filters.filter.publicationType.label": "Search publication type",
+  "search.filters.applied.f.publicationType": "Publication type",
+}
